@@ -65,7 +65,7 @@ const GlobalConfigBar = () => {
     }
 
     return (
-        <div className="w-full p-4 bg-white shadow-md rounded-[5px] space-y-6 border-1 border-gray-200">
+        <div className="w-full p-4 bg-white shadow-md rounded-[5px] space-y-6 border-1 border-gray-200 box-border">
 
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

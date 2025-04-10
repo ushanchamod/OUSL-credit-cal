@@ -59,10 +59,10 @@ export default function MultipleSelectChip({
   };
 
   return (
-    <div>
+    <div className='box-border overflow-hidden w-full'>
       <FormControl
   sx={{
-    m: 1,
+    mt: 1,
     width: "100%",
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
