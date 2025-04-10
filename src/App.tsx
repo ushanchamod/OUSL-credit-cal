@@ -26,7 +26,7 @@ const App = () => {
   return (
     <main className="bg-gray-50 h-full min-h-[100vh] box-border">
       <TopBar />
-      <div className="max-w-[1200px] m-auto p-0 sm:px-5 py-5 max-h-[100vh]">
+      <div className="max-w-[1200px] m-auto p-0 sm:px-5 py-5 min-h-[100vh]">
       
         {
           upload ? (
