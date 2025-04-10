@@ -58,6 +58,7 @@ const Result = () => {
   }, [result]);
 
   const creditStats1 = [
+    { label: 'Subjects Count', value: result?.length ?? null },
     { label: 'Selected Total Credits', value: data.totalCredit },
     { label: 'Pass Credits', value: data.passCredit },
     { label: 'Pending Credits', value: data.pendingCredit },

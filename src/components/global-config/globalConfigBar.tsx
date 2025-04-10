@@ -9,14 +9,6 @@ const GlobalConfigBar = () => {
     const setConfig = useStore(state => state.setConfig)
     const populateData = useStore(state => state.populateData)
 
-    // const handleCheckboxChange = (key: keyof typeof config) => (
-    //     event: React.ChangeEvent<HTMLInputElement>
-    // ) => {
-    //     setConfig({
-    //         ...config,
-    //         [key]: event.target.checked,
-    //     })
-    // }
 
     useEffect(() => {
         if (upload) {
@@ -31,6 +23,7 @@ const GlobalConfigBar = () => {
         config.credit,
         config.category,
         config.progress,
+        config.loy,
 
     ])
 
@@ -61,6 +54,13 @@ const GlobalConfigBar = () => {
         setConfig({
             ...config,
             progress: progress
+        })
+    }
+    
+    const setLoy = (loy: string[]) => {
+        setConfig({
+            ...config,
+            loy: loy.map(num => parseInt(num))
         })
     }
 
@@ -111,6 +111,17 @@ const GlobalConfigBar = () => {
                             : []
                     }
                     stateName={config.progress.map(i => i.toLocaleString())}
+                />
+                
+                <MultipleSelectChip
+                    label='Last Offer Year'
+                    setStateName={setLoy}
+                    state={
+                        upload
+                            ? [...new Set(upload.map(d => d.loy.toString()))]
+                            : []
+                    }
+                    stateName={config.loy.map(i => i.toString())}
                 />
             </div>
         </div>

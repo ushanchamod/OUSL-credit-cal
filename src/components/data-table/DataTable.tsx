@@ -12,6 +12,7 @@ const headers = [
   { name: "category", title: "Category" },
   { name: "progress", title: "Progress Status" },
   { name: "grade", title: "Grade" },
+  { name: "loy", title: "Year" },
   { name: "attempt", title: "Attempts" },
 ];
 

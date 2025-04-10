@@ -10,6 +10,7 @@ interface ConfigType {
   lof: number[]
   category: string[]
   progress: string[]
+  loy: number[]
 }
 
 interface StoreState {
@@ -34,6 +35,7 @@ const useStore = create<StoreState>((set) => ({
     lof: [],
     category: [],
     progress: [],
+    loy: [],
   },
   setUpload: (newData) => set({ data: newData, upload: newData }),
   populateData: (newData) => set({ data: newData }),

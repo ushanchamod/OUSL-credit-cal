@@ -67,6 +67,7 @@ export const applyFilter = (
   const includeCredit = new Set<number>();
   const includeCategory = new Set<string>();
   const includeProgress = new Set<string>();
+  const includeLoy = new Set<number>();
 
   if (config.removeResit) excluded.add("resit");
   if (config.removeRepeat) excluded.add("repeat");
@@ -84,6 +85,9 @@ export const applyFilter = (
   if (config.progress) {
     config.progress.forEach((progress) => includeProgress.add(progress));
   }
+  if (config.loy) {
+    config.loy.forEach((loy) => includeLoy.add(loy));
+  }
 
   return upload.filter((r) => {
     const isExcluded = excluded.has(r.progress.toLowerCase());
@@ -95,9 +99,10 @@ export const applyFilter = (
     
       const isCategoryIncluded = includeCategory.size === 0 || includeCategory.has(r.category);
       const isProgressIncluded = includeProgress.size === 0 || includeProgress.has(r.progress);
+      const isLoyIncluded = includeLoy.size === 0 || includeLoy.has(r.loy);
 
     return (
-      !isExcluded && isLevelIncluded && isCreditIncluded && isCategoryIncluded && isProgressIncluded
+      !isExcluded && isLevelIncluded && isCreditIncluded && isCategoryIncluded && isProgressIncluded && isLoyIncluded
     );
   });
 };
