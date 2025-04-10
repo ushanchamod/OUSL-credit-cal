@@ -1,13 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="description" content="OUSL Credit Calculator - Track and calculate your course credits for the Open University of Sri Lanka" />
+    <meta name="keywords" content="OUSL, Open University, Sri Lanka, credit calculator, academic credits, BSEHons" />
+    <meta name="author" content="Ushan Chamod Bandara" />
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="OUSL Credit Calculator" />
+    <meta property="og:description" content="Track and calculate your course credits for the Open University of Sri Lanka" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ousl-credit-calculator.vercel.app/" />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Theme Color for Browser -->
+    <meta name="theme-color" content="#4f46e5" />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <title>OUSL Credit Calculator | Track Your Academic Progress</title>
+    
+    <style>
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Prevent flash of unstyled content -->
+    <script>
+      (function() {
+        document.documentElement.classList.add('js-loading');
+        window.addEventListener('DOMContentLoaded', function() {
+          document.documentElement.classList.remove('js-loading');
+        });
+      })();
+    </script>
   </body>
 </html>
