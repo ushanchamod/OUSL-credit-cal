@@ -49,7 +49,7 @@ const PopUp = ({ setPopUp }: Props) => {
                         <section>
                             <h3 className="text-lg font-semibold mb-2 text-gray-900">2. Filtering Data</h3>
                             <ul className="list-disc list-inside space-y-2">
-                                <li>Use the <strong>Level, Credit, Category, and Progress</strong> dropdowns to filter the data as needed.</li>
+                                <li>Use the <strong>Level, Credit, Category, Year of Offer and Progress</strong> dropdowns to filter the data as needed.</li>
                                 <li>By default, all options are selected. Once you make a selection, only related records will be shown.</li>
                             </ul>
                         </section>
