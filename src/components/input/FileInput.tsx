@@ -7,6 +7,7 @@ import { MdUploadFile } from "react-icons/md";
 
 const FileInput = () => {
   const fileRef = useRef<HTMLInputElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setUpload = useStore((state: any) => state.setUpload);
 
   const handleFileChange = useCallback(

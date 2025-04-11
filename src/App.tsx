@@ -22,6 +22,7 @@ export type InputResultType = {
 };
 
 const App = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const upload = useStore((state: any) => state.upload)
   return (
     <main className="bg-gray-50 h-full min-h-[100vh] box-border">

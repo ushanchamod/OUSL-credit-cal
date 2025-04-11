@@ -5,6 +5,7 @@ const paginationModel = { page: 0, pageSize: 5 };
 
 interface Props {
   column: GridColDef[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rows: any;
 }
 

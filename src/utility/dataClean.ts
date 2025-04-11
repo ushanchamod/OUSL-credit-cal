@@ -130,7 +130,7 @@ export const applyFilter = (
 };
 
 export const calStatistics = (result: InputResultType[]) => {
-  let data = {
+  const data = {
     totalCredit: 0,
     passCredit: 0,
     resitCredit: 0,

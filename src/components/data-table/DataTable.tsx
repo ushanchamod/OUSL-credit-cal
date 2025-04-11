@@ -17,6 +17,7 @@ const headers = [
 ];
 
 const DataTable = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = useStore((state: any) => state.data);
 
   return (
