@@ -48,11 +48,26 @@ export const filterRelevantResults = (
   );
 };
 
+export const removeDuplicateRow = (results: InputResultType[]) => {
+  const map = new Map<string, InputResultType>();
+
+  results.forEach((r) => {
+    const existing = map.get(r.code);
+
+    if (!existing || r.loy > existing.loy) {
+      map.set(r.code, r); // set or replace with the one having higher 'loy'
+    }
+  });
+
+  return Array.from(map.values());
+};
+
 // Main function that uses the above functions
 export const initialDataClean = (rows: Array<string[]>): InputResultType[] => {
   const cleanedData = cleanData(rows);
   const jsonFormatted = formatToJson(cleanedData);
-  return jsonFormatted;
+  const removeDuplicate = removeDuplicateRow(jsonFormatted);
+  return removeDuplicate;
   // return filterRelevantResults(jsonFormatted);
 };
 
@@ -96,13 +111,20 @@ export const applyFilter = (
       includeLevel.size === 0 || includeLevel.has(r.level);
     const isCreditIncluded =
       includeCredit.size === 0 || includeCredit.has(r.credit);
-    
-      const isCategoryIncluded = includeCategory.size === 0 || includeCategory.has(r.category);
-      const isProgressIncluded = includeProgress.size === 0 || includeProgress.has(r.progress);
-      const isLoyIncluded = includeLoy.size === 0 || includeLoy.has(r.loy);
+
+    const isCategoryIncluded =
+      includeCategory.size === 0 || includeCategory.has(r.category);
+    const isProgressIncluded =
+      includeProgress.size === 0 || includeProgress.has(r.progress);
+    const isLoyIncluded = includeLoy.size === 0 || includeLoy.has(r.loy);
 
     return (
-      !isExcluded && isLevelIncluded && isCreditIncluded && isCategoryIncluded && isProgressIncluded && isLoyIncluded
+      !isExcluded &&
+      isLevelIncluded &&
+      isCreditIncluded &&
+      isCategoryIncluded &&
+      isProgressIncluded &&
+      isLoyIncluded
     );
   });
 };

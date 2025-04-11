@@ -56,11 +56,25 @@ const GlobalConfigBar = () => {
             progress: progress
         })
     }
-    
+
     const setLoy = (loy: string[]) => {
         setConfig({
             ...config,
             loy: loy.map(num => parseInt(num))
+        })
+    }
+
+    const clearFilters = () => {
+        setConfig({
+            removePending: false,
+            removeRepeat: false,
+            removeResit: false,
+            credit: [],
+            level: [],
+            lof: [],
+            category: [],
+            progress: [],
+            loy: [],
         })
     }
 
@@ -112,7 +126,7 @@ const GlobalConfigBar = () => {
                     }
                     stateName={config.progress.map(i => i.toLocaleString())}
                 />
-                
+
                 <MultipleSelectChip
                     label='Last Offer Year'
                     setStateName={setLoy}
@@ -123,6 +137,14 @@ const GlobalConfigBar = () => {
                     }
                     stateName={config.loy.map(i => i.toString())}
                 />
+
+                <button
+                    className="bg-[#D06718] mt-2 rounded-[4px] w-fit px-5 py-2 text-white shadow-md hover:bg-[#b65714] transition duration-300 cursor-pointer"
+                    onClick={clearFilters}
+                >
+                    Clear Filters
+                </button>
+
             </div>
         </div>
     )
