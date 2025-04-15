@@ -41,6 +41,8 @@ const Result = () => {
     repeatCredit: number | null;
     pendingCredit: number | null;
     eligibleCredit: number | null;
+    compulsoryCredit: number | null;
+    optionalCredit: number | null;
   }>({
     totalCredit: null,
     passCredit: null,
@@ -48,6 +50,8 @@ const Result = () => {
     repeatCredit: null,
     pendingCredit: null,
     eligibleCredit: null,
+    compulsoryCredit: null,
+    optionalCredit: null,
   });
 
   useEffect(() => {
@@ -62,12 +66,14 @@ const Result = () => {
     { label: 'Selected Total Credits', value: data.totalCredit },
     { label: 'Pass Credits', value: data.passCredit },
     { label: 'Pending Credits', value: data.pendingCredit },
+    { label: 'Resit Credits', value: data.resitCredit },
   ];
 
   const creditStats2 = [
-    { label: 'Resit Credits', value: data.resitCredit },
     { label: 'Repeat Credits', value: data.repeatCredit },
     { label: 'Eligible Credits', value: data.eligibleCredit },
+    { label: 'Optional Credits', value: data.optionalCredit },
+    { label: 'Compulsory Credits', value: data.compulsoryCredit },
   ];
 
   return (

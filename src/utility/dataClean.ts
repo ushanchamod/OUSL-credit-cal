@@ -175,10 +175,14 @@ export const calStatistics = (result: InputResultType[]) => {
     repeatCredit: 0,
     pendingCredit: 0,
     eligibleCredit: 0,
+    compulsoryCredit: 0,
+    optionalCredit: 0,
   };
 
   result.forEach((r) => {
     data.totalCredit += r.credit; // Add to total credit
+    data.compulsoryCredit += r.isCompulsory === "compulsory" ? r.credit : 0; // Add to compulsory credit
+    data.optionalCredit += r.isCompulsory === "optional" ? r.credit : 0; // Add to optional credit" 
     switch (r.progress.toLowerCase()) {
       case "repeat":
         data.repeatCredit += r.credit;

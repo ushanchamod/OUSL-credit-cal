@@ -1,33 +1,70 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { initialDataClean } from "../../utility/dataClean";
 import { useStore } from "../../store/global";
 import { MdUploadFile } from "react-icons/md";
 
-
 const FileInput = () => {
   const fileRef = useRef<HTMLInputElement | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setUpload = useStore((state: any) => state.setUpload);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = useCallback(
     (event: Event) => {
       const target = event.target as HTMLInputElement;
-      if (target.files && target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
+      const file = target.files?.[0];
+      setError(null); // Clear previous errors
+
+      if (!file) {
+        setError("No file selected.");
+        return;
+      }
+
+      const validTypes = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
+      if (!validTypes.includes(file.type)) {
+        setError("Invalid file type. Please upload a .xls or .xlsx file.");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0];
-          const sheet = workbook.Sheets[sheetName];
-          const rows = XLSX.utils.sheet_to_json(sheet, {
-            header: 1,
-          }) as unknown as string[][];
 
-          setUpload(initialDataClean(rows));
-        };
-        reader.readAsArrayBuffer(target.files[0]);
-      }
+          if (workbook.SheetNames.length === 0) {
+            setError("The Excel file does not contain any sheets.");
+            return;
+          }
+
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
+
+          if (rows.length === 0) {
+            setError("The Excel sheet is empty.");
+            return;
+          }
+
+          const cleanedData = initialDataClean(rows);
+
+          if (!cleanedData || cleanedData.length === 0) {
+            setError("The file was read but contains no usable data.");
+            return;
+          }
+
+          setUpload(cleanedData);
+        } catch (err) {
+          console.error("Error reading Excel file:", err);
+          setError("An error occurred while processing the file. Please try again.");
+        }
+      };
+
+      reader.onerror = () => {
+        setError("Failed to read the file.");
+      };
+
+      reader.readAsArrayBuffer(file);
     },
     [setUpload]
   );
@@ -72,7 +109,7 @@ const FileInput = () => {
           <code className="bg-gray-100 p-0.5 px-2 rounded-md text-gray-800">xlsx</code> or{" "}
           <code className="bg-gray-100 p-0.5 px-2 rounded-md text-gray-800">xls</code> files are supported.
         </p>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 text-center">
           You can download the Excel file from{" "}
           <a
             target="_blank"
@@ -83,6 +120,11 @@ const FileInput = () => {
           </a>{" "}
           website and simply upload it here.
         </p>
+
+        {/* Error message */}
+        {error && (
+          <p className="text-sm text-white font-medium text-center bg-red-500 px-2 py-1.5 rounded-sm animate-pulse ease-in-out">{error}</p>
+        )}
       </div>
     </form>
   );
