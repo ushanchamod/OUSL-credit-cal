@@ -66,14 +66,14 @@ const Result = () => {
     { label: 'Selected Total Credits', value: data.totalCredit },
     { label: 'Pass Credits', value: data.passCredit },
     { label: 'Pending Credits', value: data.pendingCredit },
-    { label: 'Resit Credits', value: data.resitCredit },
+    { label: 'Eligible Credits', value: data.eligibleCredit },
   ];
 
   const creditStats2 = [
-    { label: 'Repeat Credits', value: data.repeatCredit },
-    { label: 'Eligible Credits', value: data.eligibleCredit },
-    { label: 'Optional Credits', value: data.optionalCredit },
     { label: 'Compulsory Credits', value: data.compulsoryCredit },
+    { label: 'Optional Credits', value: data.optionalCredit },
+    { label: 'Resit Credits', value: data.resitCredit },
+    { label: 'Repeat Credits', value: data.repeatCredit },
   ];
 
   return (
