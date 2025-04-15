@@ -1,5 +1,6 @@
 import { InputResultType } from "../App";
 import { ConfigType } from "../store/global";
+import { compulsoryOrNot } from "./subject";
 
 // Step 1: Clean the data
 export const cleanData = (rows: Array<string[]>): Array<string[]> => {
@@ -62,12 +63,23 @@ export const removeDuplicateRow = (results: InputResultType[]) => {
   return Array.from(map.values());
 };
 
+const addCompulsoryOrNot = (results: InputResultType[]) => {
+  return results.map((r) => {
+    return {
+      ...r,
+      isCompulsory:
+        compulsoryOrNot.find((e) => e.code === r.code)?.status ?? "",
+    };
+  });
+};
+
 // Main function that uses the above functions
 export const initialDataClean = (rows: Array<string[]>): InputResultType[] => {
   const cleanedData = cleanData(rows);
   const jsonFormatted = formatToJson(cleanedData);
   const removeDuplicate = removeDuplicateRow(jsonFormatted);
-  return removeDuplicate;
+  const addCompulsory = addCompulsoryOrNot(removeDuplicate);
+  return addCompulsory;
   // return filterRelevantResults(jsonFormatted);
 };
 
@@ -83,6 +95,7 @@ export const applyFilter = (
   const includeCategory = new Set<string>();
   const includeProgress = new Set<string>();
   const includeLoy = new Set<number>();
+  let compulsoryOrNotFilter: null | string = null;
 
   if (config.removeResit) excluded.add("resit");
   if (config.removeRepeat) excluded.add("repeat");
@@ -118,13 +131,38 @@ export const applyFilter = (
       includeProgress.size === 0 || includeProgress.has(r.progress);
     const isLoyIncluded = includeLoy.size === 0 || includeLoy.has(r.loy);
 
+    if (config.compulsoryState === "both") {
+      compulsoryOrNotFilter = "both";
+    } else if (config.compulsoryState === "notCompulsory") {
+      compulsoryOrNotFilter = "optional";
+    } else if (config.compulsoryState === "compulsory") {
+      compulsoryOrNotFilter = "compulsory";
+    }
+
+    // else if(config.compulsoryState === "compulsory") {
+    //   compulsoryOrNotFilter = r.isCompulsory === 'compulsory'
+    // }
+    // else if(config.compulsoryState === "notCompulsory") {
+    //   compulsoryOrNotFilter = r.isCompulsory === false
+    // }
+
+    const compulsoryOrNotFilterCheck =
+      compulsoryOrNotFilter === "both"
+        ? true
+        : compulsoryOrNotFilter === "compulsory"
+        ? r.isCompulsory === "compulsory"
+        : compulsoryOrNotFilter === "optional"
+        ? r.isCompulsory === "optional"
+        : true;
+
     return (
       !isExcluded &&
       isLevelIncluded &&
       isCreditIncluded &&
       isCategoryIncluded &&
       isProgressIncluded &&
-      isLoyIncluded
+      isLoyIncluded &&
+      compulsoryOrNotFilterCheck
     );
   });
 };

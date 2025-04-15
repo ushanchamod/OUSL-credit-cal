@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useStore } from '../../store/global'
 import { applyFilter } from '../../utility/dataClean'
 import MultipleSelectChip from '../ui/MultipleSelectChip'
+import BasicSelect from '../ui/BasicSelect'
 
 const GlobalConfigBar = () => {
     const config = useStore(state => state.config)
@@ -24,6 +25,8 @@ const GlobalConfigBar = () => {
         config.category,
         config.progress,
         config.loy,
+        config.compulsoryState,
+        upload,
 
     ])
 
@@ -64,6 +67,14 @@ const GlobalConfigBar = () => {
         })
     }
 
+    const setCompulsoryState = (state: 'both' | 'compulsory' | 'notCompulsory') => {
+        setConfig({
+            ...config,
+            compulsoryState: state
+        })
+    }
+
+
     const clearFilters = () => {
         setConfig({
             removePending: false,
@@ -75,6 +86,7 @@ const GlobalConfigBar = () => {
             category: [],
             progress: [],
             loy: [],
+            compulsoryState: 'both',
         })
     }
 
@@ -136,6 +148,17 @@ const GlobalConfigBar = () => {
                             : []
                     }
                     stateName={config.loy.map(i => i.toString())}
+                />
+
+                <BasicSelect
+                    options={[
+                        { label: 'All Subject', value: 'both' },
+                        { label: 'Compulsory', value: 'compulsory' },
+                        { label: 'Optional', value: 'notCompulsory' }
+                    ]}
+                    label='Obligated'
+                    value={config.compulsoryState}
+                    setValue={(value) => setCompulsoryState(value as 'both' | 'compulsory' | 'notCompulsory')}
                 />
 
                 <button

@@ -7,6 +7,7 @@ import { InputResultType } from "../../App";
 const headers = [
   { name: "code", title: "Course Code" },
   { name: "name", title: "Course Name" },
+  { name: "isCompulsory", title: "Obligated" },
   { name: "credit", title: "Credit" },
   { name: "level", title: "Level" },
   { name: "category", title: "Category" },
@@ -17,8 +18,14 @@ const headers = [
 ];
 
 const DataTable = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = useStore((state: any) => state.data);
+
+  // Format data before rendering
+  const formattedData = data?.map((row: InputResultType) => ({
+    ...row,
+    isCompulsory: row.isCompulsory === "compulsory" ? "compulsory" : 
+      row.isCompulsory === "optional" ? "optional" : "-",
+  }));
 
   return (
     <div className="mt-8 rounded-xl shadow-md max-h-[400px] overflow-auto border border-gray-200">
@@ -28,7 +35,7 @@ const DataTable = () => {
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="bg-white px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap border-b-1 border-b-gray-300"
+                className="bg-white px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap border-b border-gray-300"
               >
                 {h.title}
               </th>
@@ -36,15 +43,15 @@ const DataTable = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {data && data.length > 0 ? (
-            data.map((row: InputResultType, index: number) => (
+          {formattedData && formattedData.length > 0 ? (
+            formattedData.map((row: Record<string, unknown>, index: number) => (
               <tr key={index} className="hover:bg-gray-50 transition duration-150">
                 {headers.map((h, i) => (
                   <td
                     key={i}
                     className="px-4 py-3 whitespace-nowrap text-sm text-gray-700"
                   >
-                    {row[h.name as keyof InputResultType] ?? "-"}
+                    {String(row[h.name] ?? "-")}
                   </td>
                 ))}
               </tr>
@@ -64,6 +71,7 @@ const DataTable = () => {
     </div>
   );
 };
+
 
 // const DataTable = () => {
 //   const _data = useStore((state: any) => state.data)

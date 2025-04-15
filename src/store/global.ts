@@ -11,6 +11,7 @@ interface ConfigType {
   category: string[]
   progress: string[]
   loy: number[]
+  compulsoryState: 'both' | 'compulsory' | 'notCompulsory'
 }
 
 interface StoreState {
@@ -36,6 +37,7 @@ const useStore = create<StoreState>((set) => ({
     category: [],
     progress: [],
     loy: [],
+    compulsoryState: 'both',
   },
   setUpload: (newData) => set({ data: newData, upload: newData }),
   populateData: (newData) => set({ data: newData }),

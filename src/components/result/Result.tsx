@@ -71,7 +71,7 @@ const Result = () => {
   ];
 
   return (
-    <div className="w-full p-6 bg-white shadow-xl rounded-lg border border-gray-200 mt-7 space-y-6 flex flex-wrap gap-6">
+    <div className="w-full p-6 bg-white shadow-md rounded-lg border border-gray-200 mt-7 space-y-6 flex flex-wrap gap-6">
       <CreditTable title="Credit Statistics (Selected)" data={creditStats1} columns={[{ label: 'Credit Type', value: 'label' }, { label: 'Credits', value: 'value' }]} />
       <CreditTable title="." data={creditStats2} columns={[{ label: 'Credit Type', value: 'label' }, { label: 'Credits', value: 'value' }]} />
     </div>
