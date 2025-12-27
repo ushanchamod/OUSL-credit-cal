@@ -86,7 +86,6 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
   // Track category credits
   const categoryCredits: Record<string, number> = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [, attempts] of coursesByCode) {
     attempts.sort((a, b) => {
       if (a.loy !== b.loy) return b.loy - a.loy;
