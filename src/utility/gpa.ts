@@ -87,7 +87,7 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
   const categoryCredits: Record<string, number> = {};
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  for (const [courseCode, attempts] of coursesByCode) {
+  for (const [, attempts] of coursesByCode) {
     attempts.sort((a, b) => {
       if (a.loy !== b.loy) return b.loy - a.loy;
       return (b.attempt || 1) - (a.attempt || 1);
@@ -258,6 +258,8 @@ const enforceCategoryLimits = (
   adjustedCredits: number;
   adjustedCategoryCredits: Record<string, number>;
 } => {
+  console.log(courses);
+
   const adjustedCategoryCredits = { ...categoryCredits };
   let adjustedCredits = totalCredits;
 
@@ -394,9 +396,10 @@ export const getNextClassInfo = (
 
 const analyzeCategoryRequirements = (
   categoryCredits: Record<string, number>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   totalCredits: number
 ): CategoryBreakdown[] => {
+  console.log(totalCredits);
+
   return Object.entries(CATEGORY_LIMITS).map(([code, info]) => {
     const credits = categoryCredits[code] || 0;
     let status: "below" | "ok" | "exceeded" = "ok";
