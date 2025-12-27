@@ -6,7 +6,7 @@ const Footer = () => {
       <p className="text-sm">
         Made with <FaHeart className="inline text-red-500 mx-1" /> by{" "}
         <a
-          href="https://ushan.site"
+          href="https://ushan.me"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[#D06718] font-signature text-base hover:underline"

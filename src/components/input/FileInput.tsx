@@ -1,26 +1,29 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import * as XLSX from "xlsx";
 import { initialDataClean } from "../../utility/dataClean";
-import { useStore } from "../../store/global";
+import { useStore, StoreState } from "../../store/global";
 import { MdUploadFile } from "react-icons/md";
 
 const FileInput = () => {
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const setUpload = useStore((state: any) => state.setUpload);
+  const setUpload = useStore((state: StoreState) => state.setUpload);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = useCallback(
     (event: Event) => {
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
-      setError(null); // Clear previous errors
+      setError(null);
 
       if (!file) {
         setError("No file selected.");
         return;
       }
 
-      const validTypes = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
+      const validTypes = [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ];
       if (!validTypes.includes(file.type)) {
         setError("Invalid file type. Please upload a .xls or .xlsx file.");
         return;
@@ -39,7 +42,9 @@ const FileInput = () => {
           }
 
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
+          const rows = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+          }) as string[][];
 
           if (rows.length === 0) {
             setError("The Excel sheet is empty.");
@@ -56,7 +61,9 @@ const FileInput = () => {
           setUpload(cleanedData);
         } catch (err) {
           console.error("Error reading Excel file:", err);
-          setError("An error occurred while processing the file. Please try again.");
+          setError(
+            "An error occurred while processing the file. Please try again."
+          );
         }
       };
 
@@ -82,9 +89,8 @@ const FileInput = () => {
   }, [handleFileChange]);
 
   return (
-    <form className="max-w-md mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg border border-gray-200">
-      <div className="flex flex-col items-center gap-6">
-        {/* Hidden file input */}
+    <form className="max-w-md mx-auto p-0">
+      <div className="flex flex-col items-center gap-4">
         <input
           type="file"
           id="fileInput"
@@ -93,37 +99,24 @@ const FileInput = () => {
           accept=".xls,.xlsx"
         />
 
-        {/* Styled button with icon */}
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="flex items-center gap-2 px-6 py-3 bg-[#D06718] text-white rounded-md shadow-md hover:bg-[#d05218] transition duration-200 cursor-pointer"
+          className="flex items-center gap-2 px-6 py-3 bg-[#D06718] text-white rounded-md shadow-md hover:bg-[#d05218] transition duration-200 cursor-pointer w-full justify-center"
         >
           <MdUploadFile className="text-[23px]" />
           Upload Excel File
         </button>
 
-        {/* File Upload Info */}
-        <p className="text-sm text-gray-600">
-          Only{" "}
-          <code className="bg-gray-100 p-0.5 px-2 rounded-md text-gray-800">xlsx</code> or{" "}
-          <code className="bg-gray-100 p-0.5 px-2 rounded-md text-gray-800">xls</code> files are supported.
-        </p>
-        <p className="text-sm text-gray-400 text-center">
-          You can download the Excel file from{" "}
-          <a
-            target="_blank"
-            href="http://myousl.ou.ac.lk/"
-            className="text-blue-500 hover:underline"
-          >
-            myousl
-          </a>{" "}
-          website and simply upload it here.
+        <p className="text-sm text-gray-500 text-center">
+          Supports <code className="bg-gray-100 px-1 rounded">.xlsx</code> or{" "}
+          <code className="bg-gray-100 px-1 rounded">.xls</code> from MyOUSL.
         </p>
 
-        {/* Error message */}
         {error && (
-          <p className="text-sm text-white font-medium text-center bg-red-500 px-2 py-1.5 rounded-sm animate-pulse ease-in-out">{error}</p>
+          <p className="text-sm text-white font-medium text-center bg-red-500 px-3 py-2 rounded-md w-full animate-pulse">
+            {error}
+          </p>
         )}
       </div>
     </form>
