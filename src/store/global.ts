@@ -1,17 +1,17 @@
 import { create } from "zustand";
-import { InputResultType } from "../App";
+import type { InputResultType } from "../App";
 
 interface ConfigType {
   removePending: boolean;
   removeResit: boolean;
   removeRepeat: boolean;
-  level: number[],
-  credit: number[],
-  lof: number[]
-  category: string[]
-  progress: string[]
-  loy: number[]
-  compulsoryState: 'both' | 'compulsory' | 'notCompulsory'
+  level: number[];
+  credit: number[];
+  lof: number[];
+  category: string[];
+  progress: string[];
+  loy: number[];
+  compulsoryState: "both" | "compulsory" | "notCompulsory";
 }
 
 interface StoreState {
@@ -19,7 +19,6 @@ interface StoreState {
   data: InputResultType[] | null;
   populateData: (newData: InputResultType[]) => void;
   setUpload: (newData: InputResultType[]) => void;
-
   config: ConfigType;
   setConfig: (c: ConfigType) => void;
 }
@@ -37,7 +36,7 @@ const useStore = create<StoreState>((set) => ({
     category: [],
     progress: [],
     loy: [],
-    compulsoryState: 'both',
+    compulsoryState: "both",
   },
   setUpload: (newData) => set({ data: newData, upload: newData }),
   populateData: (newData) => set({ data: newData }),

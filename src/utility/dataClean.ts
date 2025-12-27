@@ -1,38 +1,39 @@
-import { InputResultType } from "../App";
-import { ConfigType } from "../store/global";
+import type { InputResultType } from "../App";
+import type { ConfigType } from "../store/global";
 import { compulsoryOrNot } from "./subject";
 
 // Step 1: Clean the data
-export const cleanData = (rows: Array<string[]>): Array<string[]> => {
+export const cleanData = (rows: string[][]): string[][] => {
   return rows.map((d, index) => {
     if (index === 0) return d;
-    else {
-      const newRow = [...d];
-      newRow.splice(7, 1);
-      return newRow;
-    }
+    const newRow = [...d];
+    newRow.splice(7, 1);
+    return newRow;
   });
 };
 
 // Step 2: Format to JSON
-export const formatToJson = (data: Array<string[]>): InputResultType[] => {
+export const formatToJson = (data: string[][]): InputResultType[] => {
   return data
     .map((d, index) => {
-      if (index !== 0) {
-        return {
-          id: d[0],
-          code: d[0],
-          level: parseInt(d[0][3]),
-          credit: parseInt(d[0][4]),
-          category: d[0][2],
-          name: d[1],
-          loy: d[2], // Last Offered Year
-          progress: d[3],
-          grade: d[4],
-          attempt: parseInt(d[5]), // Convert 'attempt' to number
-          el: d[6], // Eligibility Left
-        } as unknown as InputResultType;
-      }
+      if (index === 0) return undefined;
+
+      if (!d[0] || d[0].length < 5) return undefined;
+
+      return {
+        id: d[0],
+        code: d[0],
+        level: Number.parseInt(d[0][3] ?? "0", 10),
+        credit: Number.parseInt(d[0][4] ?? "0", 10),
+        category: d[0][2] ?? "",
+        name: d[1] ?? "",
+        loy: Number(d[2] ?? 0),
+        progress: d[3] ?? "",
+        grade: d[4] ?? "",
+        attempt: Number.parseInt(d[5] ?? "0", 10),
+        el: Number(d[6] ?? 0),
+        isCompulsory: "",
+      } as InputResultType;
     })
     .filter((a): a is InputResultType => a !== undefined);
 };
@@ -44,37 +45,35 @@ export const filterRelevantResults = (
   return results.filter(
     (result) =>
       result.level > 3 &&
-      result.progress.toLocaleLowerCase() === "pass" &&
+      result.progress.toLowerCase() === "pass" &&
       result.credit > 0
   );
 };
 
-export const removeDuplicateRow = (results: InputResultType[]) => {
+export const removeDuplicateRow = (
+  results: InputResultType[]
+): InputResultType[] => {
   const map = new Map<string, InputResultType>();
 
-  results.forEach((r) => {
+  for (const r of results) {
     const existing = map.get(r.code);
-
     if (!existing || r.loy > existing.loy) {
-      map.set(r.code, r); // set or replace with the one having higher 'loy'
+      map.set(r.code, r);
     }
-  });
+  }
 
   return Array.from(map.values());
 };
 
-const addCompulsoryOrNot = (results: InputResultType[]) => {
-  return results.map((r) => {
-    return {
-      ...r,
-      isCompulsory:
-        compulsoryOrNot.find((e) => e.code === r.code)?.status ?? "",
-    };
-  });
+const addCompulsoryOrNot = (results: InputResultType[]): InputResultType[] => {
+  return results.map((r) => ({
+    ...r,
+    isCompulsory: compulsoryOrNot.find((e) => e.code === r.code)?.status ?? "",
+  }));
 };
 
 // Main function that uses the above functions
-export const initialDataClean = (rows: Array<string[]>): InputResultType[] => {
+export const initialDataClean = (rows: string[][]): InputResultType[] => {
   const cleanedData = cleanData(rows);
   const jsonFormatted = formatToJson(cleanedData);
   const removeDuplicate = removeDuplicateRow(jsonFormatted);
@@ -89,71 +88,35 @@ export const applyFilter = (
 ): InputResultType[] => {
   if (!upload) throw new Error("upload must be defined");
 
-  const excluded = new Set<string | number>();
-  const includeLevel = new Set<number>();
-  const includeCredit = new Set<number>();
-  const includeCategory = new Set<string>();
-  const includeProgress = new Set<string>();
-  const includeLoy = new Set<number>();
-  let compulsoryOrNotFilter: null | string = null;
+  const excluded = new Set<string>();
+  const includeLevel = new Set(config.level);
+  const includeCredit = new Set(config.credit);
+  const includeCategory = new Set(config.category);
+  const includeProgress = new Set(config.progress);
+  const includeLoy = new Set(config.loy);
 
   if (config.removeResit) excluded.add("resit");
   if (config.removeRepeat) excluded.add("repeat");
   if (config.removePending) excluded.add("pending");
 
-  if (config.level) {
-    config.level.forEach((level) => includeLevel.add(level));
-  }
-  if (config.credit) {
-    config.credit.forEach((credit) => includeCredit.add(credit));
-  }
-  if (config.category) {
-    config.category.forEach((category) => includeCategory.add(category));
-  }
-  if (config.progress) {
-    config.progress.forEach((progress) => includeProgress.add(progress));
-  }
-  if (config.loy) {
-    config.loy.forEach((loy) => includeLoy.add(loy));
-  }
-
   return upload.filter((r) => {
     const isExcluded = excluded.has(r.progress.toLowerCase());
-
     const isLevelIncluded =
       includeLevel.size === 0 || includeLevel.has(r.level);
     const isCreditIncluded =
       includeCredit.size === 0 || includeCredit.has(r.credit);
-
     const isCategoryIncluded =
       includeCategory.size === 0 || includeCategory.has(r.category);
     const isProgressIncluded =
       includeProgress.size === 0 || includeProgress.has(r.progress);
     const isLoyIncluded = includeLoy.size === 0 || includeLoy.has(r.loy);
 
-    if (config.compulsoryState === "both") {
-      compulsoryOrNotFilter = "both";
-    } else if (config.compulsoryState === "notCompulsory") {
-      compulsoryOrNotFilter = "optional";
-    } else if (config.compulsoryState === "compulsory") {
-      compulsoryOrNotFilter = "compulsory";
-    }
-
-    // else if(config.compulsoryState === "compulsory") {
-    //   compulsoryOrNotFilter = r.isCompulsory === 'compulsory'
-    // }
-    // else if(config.compulsoryState === "notCompulsory") {
-    //   compulsoryOrNotFilter = r.isCompulsory === false
-    // }
-
     const compulsoryOrNotFilterCheck =
-      compulsoryOrNotFilter === "both"
+      config.compulsoryState === "both"
         ? true
-        : compulsoryOrNotFilter === "compulsory"
+        : config.compulsoryState === "compulsory"
         ? r.isCompulsory === "compulsory"
-        : compulsoryOrNotFilter === "optional"
-        ? r.isCompulsory === "optional"
-        : true;
+        : r.isCompulsory === "optional";
 
     return (
       !isExcluded &&
@@ -179,11 +142,13 @@ export const calStatistics = (result: InputResultType[]) => {
     optionalCredit: 0,
   };
 
-  result.forEach((r) => {
-    data.totalCredit += r.credit; // Add to total credit
-    data.compulsoryCredit += r.isCompulsory === "compulsory" ? r.credit : 0; // Add to compulsory credit
-    data.optionalCredit += r.isCompulsory === "optional" ? r.credit : 0; // Add to optional credit" 
-    switch (r.progress.toLowerCase()) {
+  for (const r of result) {
+    data.totalCredit += r.credit;
+    data.compulsoryCredit += r.isCompulsory === "compulsory" ? r.credit : 0;
+    data.optionalCredit += r.isCompulsory === "optional" ? r.credit : 0;
+
+    const progress = r.progress.toLowerCase();
+    switch (progress) {
       case "repeat":
         data.repeatCredit += r.credit;
         break;
@@ -199,10 +164,8 @@ export const calStatistics = (result: InputResultType[]) => {
       case "pass":
         data.passCredit += r.credit;
         break;
-      default:
-        break;
     }
-  });
+  }
 
   return data;
 };

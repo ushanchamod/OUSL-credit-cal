@@ -1,11 +1,12 @@
-import { Theme, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Chip from '@mui/material/Chip';
+import type { Theme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { type SelectChangeEvent } from "@mui/material/Select";
+import Chip from "@mui/material/Chip";
 
 interface Props {
   label: string;
@@ -37,87 +38,78 @@ export default function MultipleSelectChip({
   label,
   state,
   stateName,
-  setStateName
+  setStateName,
 }: Props) {
   const theme = useTheme();
-
-  // Set all items in state as the default selected options if stateName is empty
-  //   React.useEffect(() => {
-  //     if (stateName.length === 0 && state.length > 0) {
-  //       setStateName(state);  // Select all options by default
-  //     }
-  //   }, [state, stateName, setStateName]);
 
   const handleChange = (event: SelectChangeEvent<typeof stateName>) => {
     const {
       target: { value },
     } = event;
-    setStateName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    setStateName(typeof value === "string" ? value.split(",") : value);
   };
 
   return (
-    <div className='box-border overflow-hidden w-full'>
+    <div className="box-border overflow-hidden w-full">
       <FormControl
-  sx={{
-    mt: 1,
-    width: "100%",
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        // borderColor: "#D06718",
-      },
-      "&:hover fieldset": {
-        borderColor: "#D06718",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#D06718",
-      },
-    },
-    "& label.Mui-focused": {
-      color: "#D06718",
-    },
-  }}
-  size="small"
->
-  <InputLabel
-    id="demo-multiple-chip-label"
-    sx={{
-      background: "#fff",
-      padding: "0 5px 0 2px",
-    }}
-  >
-    {label || ""}
-  </InputLabel>
-  <Select
-    labelId="demo-multiple-chip-label"
-    id="demo-multiple-chip"
-    multiple
-    value={stateName}
-    onChange={handleChange}
-    input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-    renderValue={(selected) => (
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-        {selected.map((value) => (
-          <Chip key={value} label={value} />
-        ))}
-      </Box>
-    )}
-    MenuProps={MenuProps}
-  >
-    {state.map((name) => (
-      <MenuItem
-        key={name}
-        value={name}
-        style={getStyles(name, stateName, theme)}
+        sx={{
+          mt: 1,
+          width: "100%",
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#e5e5e5",
+            },
+            "&:hover fieldset": {
+              borderColor: "#D06718",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#D06718",
+            },
+          },
+          "& label.Mui-focused": {
+            color: "#D06718",
+          },
+        }}
+        size="small"
       >
-        {name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
+        <InputLabel
+          id={`${label}-multiple-chip-label`}
+          sx={{
+            background: "#fff",
+            padding: "0 5px 0 2px",
+          }}
+        >
+          {label}
+        </InputLabel>
+        <Select
+          labelId={`${label}-multiple-chip-label`}
+          id={`${label}-multiple-chip`}
+          multiple
+          value={stateName}
+          onChange={handleChange}
+          input={
+            <OutlinedInput id={`${label}-select-multiple-chip`} label={label} />
+          }
+          renderValue={(selected) => (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {selected.map((value) => (
+                <Chip key={value} label={value} size="small" />
+              ))}
+            </Box>
+          )}
+          MenuProps={MenuProps}
+        >
+          {state.map((name) => (
+            <MenuItem
+              key={name}
+              value={name}
+              style={getStyles(name, stateName, theme)}
+            >
+              {name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </div>
   );
 }

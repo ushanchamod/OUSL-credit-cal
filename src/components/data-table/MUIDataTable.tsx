@@ -1,12 +1,12 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import Paper from '@mui/material/Paper';
+import type { GridColDef } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import Paper from "@mui/material/Paper";
 
 const paginationModel = { page: 0, pageSize: 5 };
 
 interface Props {
   column: GridColDef[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rows: any;
+  rows: unknown[];
 }
 
 export default function MUIDataTable({ column, rows }: Props) {
@@ -15,12 +15,12 @@ export default function MUIDataTable({ column, rows }: Props) {
       <Paper
         elevation={3}
         sx={{
-          width: '100%',
-          minWidth: '800px',
-          maxWidth: '1200px',
-          mx: 'auto',
-          borderRadius: '16px',
-          padding: '8px',
+          width: "100%",
+          minWidth: "800px",
+          maxWidth: "1200px",
+          mx: "auto",
+          borderRadius: "16px",
+          padding: "8px",
         }}
       >
         <DataGrid
@@ -30,16 +30,7 @@ export default function MUIDataTable({ column, rows }: Props) {
           pageSizeOptions={[5, 10, 25, 50]}
           sx={{
             border: 0,
-            maxHeight: '300px',
-            // fontFamily: 'Inter, sans-serif',
-            // '& .MuiDataGrid-columnHeaders': {
-            //   backgroundColor: '#f3f4f6', // Tailwind gray-100
-            //   fontWeight: 600,
-            //   fontSize: '14px',
-            // },
-            // '& .MuiDataGrid-cell': {
-            //   fontSize: '14px',
-            // },
+            maxHeight: "300px",
           }}
           disableColumnFilter
           disableRowSelectionOnClick
