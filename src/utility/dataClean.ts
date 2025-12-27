@@ -18,12 +18,16 @@ export const formatToJson = (data: string[][]): InputResultType[] => {
     .map((d, index) => {
       if (index === 0) return undefined;
 
-      if (!d[0] || d[0].length < 5) return undefined;
+      // FIX: Trim the code to remove leading/trailing spaces
+      const rawCode = d[0];
+      if (!rawCode || rawCode.length < 5) return undefined;
+
+      const cleanCode = rawCode.trim();
 
       return {
-        id: d[0],
-        code: d[0],
-        level: Number.parseInt(d[0][3] ?? "0", 10),
+        id: cleanCode, // Use cleanCode here
+        code: cleanCode, // Use cleanCode here
+        level: Number.parseInt(d[0][3] ?? "0", 10), // Note: d[0] access here works if format is standard (e.g. EEI3...)
         credit: Number.parseInt(d[0][4] ?? "0", 10),
         category: d[0][2] ?? "",
         name: d[1] ?? "",

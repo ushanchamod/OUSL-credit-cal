@@ -2,22 +2,35 @@ import type { InputResultType } from "../App";
 import { gradingSystem } from "./gpvList";
 import { GPA_CLASSIFICATION } from "../data/courses";
 
-const EXCLUDED_COURSES = new Set(["FDE3023", "LTE34SE", "MHZ2250"]);
+// COMPLETE LIST of Non-GPA / Continuing Education courses to exclude
+const EXCLUDED_COURSES = new Set([
+  "FDE3023",
+  "LTE34SE",
+  "MHZ2250",
+  "FDE3020", // Legacy Efil
+  "LTE3401", // Legacy English (Non-GPA)
+  "LEE3410", // Legacy English (Alternate code)
+  "CYE3200", // Legacy Continuing Ed
+  "CSE3213", // Legacy Continuing Ed
+  "CSE3214", // Legacy Continuing Ed
+]);
 
 const PASS_GRADES = new Set(["A+", "A", "A-", "B+", "B", "B-", "C+", "C"]);
-const FAIL_GRADES = new Set(["C-", "D+", "D", "E"]);
+// Failures do not count towards "Degree Awarding GPA" (Section 6.8)
+const FAIL_GRADES = new Set(["C-", "D+", "D", "E", "F"]);
 
 const TOTAL_DEGREE_CREDITS = 125;
 
+// Guidebook Category Limits
 const CATEGORY_LIMITS = {
   I: { name: "Industrial Studies", min: 67, max: 78 },
-  S: { name: "Engineering Sciences", min: 0, max: 78 }, // Combined with I, total I+S max 78
+  S: { name: "Engineering Sciences", min: 0, max: 78 }, // Combined with I
   M: { name: "Management", min: 11, max: 20 },
   J: { name: "General/Humanities", min: 3, max: 6 },
   Z: { name: "Mathematics", min: 12, max: 12 },
   R: { name: "Project", min: 9, max: 13 },
   L: { name: "Language", min: 6, max: 6 },
-  E: { name: "English", min: 0, max: 6 }, // Combined with L, total L+E = 6
+  E: { name: "English", min: 0, max: 6 }, // Combined with L
   W: { name: "Industrial Training", min: 6, max: 6 },
 };
 
@@ -32,7 +45,7 @@ export interface CourseInGPA {
   category: string;
   isCompulsory: boolean;
   attempt: number;
-  status: "included" | "excluded" | "failed" | "superseded";
+  status: "included" | "excluded" | "failed" | "superseded" | "excess_limit";
   loy: number;
 }
 
@@ -65,16 +78,13 @@ export interface CategoryBreakdown {
 export const calculateGPA = (results: InputResultType[]): GPAResult => {
   const coursesByCode = new Map<string, InputResultType[]>();
 
+  // Group by course code to handle retakes
   for (const course of results) {
     if (!coursesByCode.has(course.code)) {
       coursesByCode.set(course.code, []);
     }
     coursesByCode.get(course.code)!.push(course);
   }
-
-  let totalWeightedGPV = 0;
-  let totalGPACredits = 0;
-  let totalCreditsEarned = 0;
 
   const coursesIncluded: CourseInGPA[] = [];
   const coursesExcluded: CourseInGPA[] = [];
@@ -83,10 +93,8 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
   const optionalFailures: CourseInGPA[] = [];
   const warnings: string[] = [];
 
-  // Track category credits
-  const categoryCredits: Record<string, number> = {};
-
   for (const [, attempts] of coursesByCode) {
+    // Sort attempts: Latest Year (LOY) desc, then Attempt Number desc
     attempts.sort((a, b) => {
       if (a.loy !== b.loy) return b.loy - a.loy;
       return (b.attempt || 1) - (a.attempt || 1);
@@ -95,34 +103,39 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
     let bestPassingAttempt: InputResultType | null = null;
     let latestFailedAttempt: InputResultType | null = null;
 
+    // Find best pass or latest fail
     for (const attempt of attempts) {
       const gradeStr = attempt.grade?.toString().trim();
-
       if (!gradeStr) continue;
 
       if (PASS_GRADES.has(gradeStr)) {
-        bestPassingAttempt = attempt;
-        break; // Take the latest passing attempt
-      } else if (FAIL_GRADES.has(gradeStr)) {
-        if (!latestFailedAttempt) {
-          latestFailedAttempt = attempt;
+        // If multiple passes exist, Guidebook usually counts the best one for GPA
+        // (unless capped at C, but here we assume best grade stands for "Current Status")
+        if (
+          !bestPassingAttempt ||
+          (gradingSystem.find((g) => g.grade === gradeStr)?.gpv || 0) >
+            (gradingSystem.find((g) => g.grade === bestPassingAttempt?.grade)
+              ?.gpv || 0)
+        ) {
+          bestPassingAttempt = attempt;
         }
+      } else if (FAIL_GRADES.has(gradeStr)) {
+        if (!latestFailedAttempt) latestFailedAttempt = attempt;
       }
     }
 
     const courseToProcess =
       bestPassingAttempt || latestFailedAttempt || attempts[0];
-
     if (!courseToProcess) continue;
 
     const gradeStr = courseToProcess.grade?.toString().trim();
     const gradeInfo = gradingSystem.find((g) => g.grade === gradeStr);
-    const isCompulsory =
-      courseToProcess.isCompulsory?.toString().toLowerCase() === "compulsory" ||
-      courseToProcess.isCompulsory?.toString().toLowerCase() === "yes" ||
-      courseToProcess.isCompulsory?.toString().toLowerCase() === "y";
 
-    // Skip if no valid grade or credit
+    // Normalize Compulsory Flag
+    const isCompulsory = ["compulsory", "yes", "true"].includes(
+      String(courseToProcess.isCompulsory).toLowerCase()
+    );
+
     if (!gradeInfo || !gradeStr || courseToProcess.credit <= 0) continue;
 
     const courseInfo: CourseInGPA = {
@@ -140,44 +153,36 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
       loy: courseToProcess.loy,
     };
 
-    if (attempts.length > 1) {
-      for (const oldAttempt of attempts) {
-        if (oldAttempt !== courseToProcess) {
-          const oldGrade = oldAttempt.grade?.toString().trim();
-          const oldGradeInfo = gradingSystem.find((g) => g.grade === oldGrade);
-          if (oldGradeInfo) {
-            coursesExcluded.push({
-              ...courseInfo,
-              grade: oldGrade,
-              gpv: oldGradeInfo.gpv,
-              weightedPoints: courseToProcess.credit * oldGradeInfo.gpv,
-              attempt: oldAttempt.attempt || 1,
-              loy: oldAttempt.loy,
-              status: "superseded",
-            });
-          }
-        }
-      }
-    }
-
+    // 1. Handle Excluded/Continuing Ed Courses
     if (EXCLUDED_COURSES.has(courseToProcess.code)) {
       courseInfo.status = "excluded";
       coursesExcluded.push(courseInfo);
       continue;
     }
 
+    // 2. Handle Superseded Attempts (History)
+    if (attempts.length > 1) {
+      for (const oldAttempt of attempts) {
+        if (oldAttempt !== courseToProcess) {
+          coursesExcluded.push({
+            ...courseInfo,
+            grade: oldAttempt.grade?.toString() ?? "",
+            status: "superseded",
+          });
+        }
+      }
+    }
+
+    // 3. Handle Failures (Excluded from Degree GPA)
     if (FAIL_GRADES.has(gradeStr)) {
       courseInfo.status = "failed";
       failedCourses.push(courseInfo);
-
-      if (isCompulsory) {
-        compulsoryFailures.push(courseInfo);
-      } else {
-        optionalFailures.push(courseInfo);
-      }
+      if (isCompulsory) compulsoryFailures.push(courseInfo);
+      else optionalFailures.push(courseInfo);
       continue;
     }
 
+    // 4. Handle Invalid Grades
     if (!PASS_GRADES.has(gradeStr)) {
       courseInfo.status = "excluded";
       coursesExcluded.push(courseInfo);
@@ -187,42 +192,42 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
       continue;
     }
 
-    // Include in GPA calculation
-    totalWeightedGPV += courseInfo.weightedPoints;
-    totalGPACredits += courseToProcess.credit;
-    totalCreditsEarned += courseToProcess.credit;
+    // Add to potential inclusion list (Optimization will filter this later)
     coursesIncluded.push(courseInfo);
-
-    // Track category credits
-    categoryCredits[courseToProcess.category] =
-      (categoryCredits[courseToProcess.category] || 0) + courseToProcess.credit;
   }
 
-  const { adjustedCredits, adjustedCategoryCredits } = enforceCategoryLimits(
+  // === CRITICAL: Optimize for Category Limits (Guidebook 6.8.2) ===
+  const optimizedIncludedCourses = optimizeCoursesForLimits(
     coursesIncluded,
-    categoryCredits,
-    totalCreditsEarned
+    warnings
   );
 
-  if (adjustedCredits !== totalCreditsEarned) {
-    totalCreditsEarned = adjustedCredits;
-    warnings.push(
-      `Some courses excluded due to category limits per guidebook Table 1. Total credits adjusted to ${adjustedCredits}.`
-    );
+  // Calculate Totals
+  let totalWeightedGPV = 0;
+  let totalGPACredits = 0;
+  const categoryCredits: Record<string, number> = {};
+
+  for (const course of optimizedIncludedCourses) {
+    if (course.status === "included") {
+      totalWeightedGPV += course.weightedPoints;
+      totalGPACredits += course.credit;
+
+      const cat = normalizeCategory(course.category);
+      categoryCredits[cat] = (categoryCredits[cat] || 0) + course.credit;
+    } else if (course.status === "excess_limit") {
+      coursesExcluded.push(course);
+    }
   }
 
-  if (totalCreditsEarned > TOTAL_DEGREE_CREDITS) {
-    warnings.push(
-      `Total credits (${totalCreditsEarned}) exceeds maximum ${TOTAL_DEGREE_CREDITS}. Excess credits excluded per guidebook.`
-    );
-  }
-
+  const finalIncluded = optimizedIncludedCourses.filter(
+    (c) => c.status === "included"
+  );
   const gpa = totalGPACredits > 0 ? totalWeightedGPV / totalGPACredits : 0;
+  const totalCreditsEarned = totalGPACredits;
   const currentClass = getCurrentClass(gpa, totalCreditsEarned);
 
-  // Calculate category breakdown
   const categoryBreakdown = analyzeCategoryRequirements(
-    adjustedCategoryCredits,
+    categoryCredits,
     totalCreditsEarned
   );
 
@@ -231,7 +236,7 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
     rawGpa: gpa,
     gpaCredits: totalGPACredits,
     totalCreditsEarned,
-    coursesIncluded: coursesIncluded.sort(
+    coursesIncluded: finalIncluded.sort(
       (a, b) => b.level - a.level || a.code.localeCompare(b.code)
     ),
     coursesExcluded: coursesExcluded.sort(
@@ -249,54 +254,99 @@ export const calculateGPA = (results: InputResultType[]): GPAResult => {
   };
 };
 
-const enforceCategoryLimits = (
+// Map Legacy Categories (X, Y) to Current (I, R)
+const normalizeCategory = (cat: string): string => {
+  if (cat === "X") return "I"; // Legacy Engineering -> Industrial
+  if (cat === "Y") return "R"; // Legacy Project -> Project
+  return cat;
+};
+
+/**
+ * Enforces Guidebook Rule 6.8.2:
+ * "Excess course credits shall be eliminated by considering Level 3 courses first...
+ * Such eliminated courses shall not be in the compulsory course combinations."
+ */
+const optimizeCoursesForLimits = (
   courses: CourseInGPA[],
-  categoryCredits: Record<string, number>,
-  totalCredits: number
-): {
-  adjustedCredits: number;
-  adjustedCategoryCredits: Record<string, number>;
-} => {
-  console.log(courses);
+  warnings: string[]
+): CourseInGPA[] => {
+  const result = [...courses];
 
-  const adjustedCategoryCredits = { ...categoryCredits };
-  let adjustedCredits = totalCredits;
+  // Helper: Count active credits in specific categories
+  const countCredits = (cats: string[]) =>
+    result
+      .filter(
+        (c) =>
+          c.status === "included" &&
+          cats.includes(normalizeCategory(c.category))
+      )
+      .reduce((sum, c) => sum + c.credit, 0);
 
-  // Check I+S combined limit (max 78)
-  const iCredits = adjustedCategoryCredits.I || 0;
-  const sCredits = adjustedCategoryCredits.S || 0;
-  if (iCredits + sCredits > 78) {
-    const excess = iCredits + sCredits - 78;
-    adjustedCredits -= excess;
-  }
+  // Helper: Drop excess credits
+  const dropExcess = (targetCategories: string[], maxLimit: number) => {
+    let currentTotal = countCredits(targetCategories);
 
-  // Check L+E combined limit (total 6)
-  const lCredits = adjustedCategoryCredits.L || 0;
-  const eCredits = adjustedCategoryCredits.E || 0;
-  if (lCredits + eCredits > 6) {
-    const excess = lCredits + eCredits - 6;
-    adjustedCredits -= excess;
-  }
+    if (currentTotal > maxLimit) {
+      // Candidates: Included, in Target Categories, Optional Only
+      const candidates = result.filter(
+        (c) =>
+          c.status === "included" &&
+          targetCategories.includes(normalizeCategory(c.category)) &&
+          !c.isCompulsory
+      );
 
-  // Check individual category limits
-  for (const [category, limits] of Object.entries(CATEGORY_LIMITS)) {
-    const credits = adjustedCategoryCredits[category] || 0;
-    if (credits > limits.max) {
-      const excess = credits - limits.max;
-      adjustedCredits -= excess;
-      adjustedCategoryCredits[category] = limits.max;
+      // Sort Priority for Dropping:
+      // 1. Level: Ascending (Level 3 dropped before Level 4)
+      // 2. GPV: Ascending (Lowest Grade dropped first to protect high GPA)
+      candidates.sort((a, b) => {
+        if (a.level !== b.level) return a.level - b.level;
+        return a.gpv - b.gpv;
+      });
+
+      for (const candidate of candidates) {
+        if (currentTotal <= maxLimit) break;
+
+        candidate.status = "excess_limit";
+        currentTotal -= candidate.credit;
+      }
+
+      // Add Warning
+      if (currentTotal > maxLimit) {
+        warnings.push(
+          `Category Limit Exceeded: [${targetCategories.join(
+            ","
+          )}]. Current: ${currentTotal}. Limit: ${maxLimit}. Remaining courses are Compulsory and cannot be dropped.`
+        );
+      } else {
+        warnings.push(
+          `Optimized GPA: Dropped excess optional credits in [${targetCategories.join(
+            ","
+          )}] (starting with Level 3 & lowest grades) to meet limit of ${maxLimit}.`
+        );
+      }
     }
-  }
+  };
 
-  return { adjustedCredits, adjustedCategoryCredits };
+  // 1. Enforce Combined Industrial Limit (I + S + X <= 78)
+  dropExcess(["I", "S"], 78);
+
+  // 2. Enforce Combined Language Limit (L + E <= 6)
+  dropExcess(["L", "E"], 6);
+
+  // 3. Enforce Individual Limits
+  dropExcess(["M"], 20);
+  dropExcess(["J"], 6);
+  dropExcess(["Z"], 12);
+  dropExcess(["R"], 13);
+  dropExcess(["W"], 6);
+
+  return result;
 };
 
 const getCurrentClass = (gpa: number, totalCredits: number): string => {
-  // Must have minimum 125 credits to graduate
   if (totalCredits < TOTAL_DEGREE_CREDITS) {
     return `In Progress (${totalCredits}/${TOTAL_DEGREE_CREDITS} credits)`;
   }
-
   if (gpa >= GPA_CLASSIFICATION.FIRST_CLASS) return "First Class";
   if (gpa >= GPA_CLASSIFICATION.SECOND_UPPER)
     return "Second Class (Upper Division)";
@@ -306,20 +356,10 @@ const getCurrentClass = (gpa: number, totalCredits: number): string => {
   return "Below Pass (GPA < 2.00)";
 };
 
-interface NextClassInfo {
-  message: string;
-  achievable: boolean;
-  requiredAvgGpa: number;
-  reqGrade: string;
-  targetClass: string;
-  targetGpa?: number;
-  remainingCredits?: number;
-}
-
 export const getNextClassInfo = (
   currentGpa: number,
   currentCredits: number
-): NextClassInfo => {
+) => {
   const classes = [
     { name: "Pass", gpa: GPA_CLASSIFICATION.PASS },
     {
@@ -338,7 +378,7 @@ export const getNextClassInfo = (
   if (!nextClass) {
     return {
       message:
-        "Outstanding! You are currently maintaining a First Class standing. Keep up this excellent work!",
+        "Outstanding! You are currently maintaining a First Class standing.",
       achievable: true,
       requiredAvgGpa: 0,
       reqGrade: "N/A",
@@ -350,7 +390,7 @@ export const getNextClassInfo = (
 
   if (remainingCredits === 0) {
     return {
-      message: `You have completed the credit requirements. Your final GPA is ${currentGpa.toFixed(
+      message: `You have completed the credit requirements. Final GPA: ${currentGpa.toFixed(
         2
       )}.`,
       achievable: false,
@@ -388,8 +428,8 @@ export const getNextClassInfo = (
           nextClass.name
         }, you need an average GPA of ${requiredAvgGpa.toFixed(
           2
-        )} (approximately ${reqGrade} grade) over your remaining ${remainingCredits} credits.`
-      : `Reaching ${nextClass.name} is mathematically difficult with the credits remaining (Required GPA > 4.0). Focus on solidifying your current standing!`,
+        )} (${reqGrade}) over your remaining ${remainingCredits} credits.`
+      : `Reaching ${nextClass.name} is mathematically difficult (Required GPA > 4.0).`,
   };
 };
 

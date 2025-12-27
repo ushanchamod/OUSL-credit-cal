@@ -11,7 +11,9 @@ export interface CourseInfo {
 
 // BSE Software Engineering Course Database
 export const BSE_COURSES: Record<string, CourseInfo> = {
-  // Level 3 - Compulsory courses
+  // =================================================================
+  // LEVEL 3
+  // =================================================================
   EEI3372: {
     code: "EEI3372",
     name: "Programming in Python",
@@ -111,8 +113,6 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     isCompulsory: true,
     semester: 2,
   },
-
-  // Level 3 - Elective
   EEM3366: {
     code: "EEM3366",
     name: "Introduction to Business Studies",
@@ -123,7 +123,9 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     semester: 2,
   },
 
-  // Level 4 - Compulsory courses
+  // =================================================================
+  // LEVEL 4
+  // =================================================================
   EEI4267: {
     code: "EEI4267",
     name: "Requirement Engineering",
@@ -223,8 +225,6 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     isCompulsory: true,
     semester: 4,
   },
-
-  // Level 4 - Elective courses
   EEI4369: {
     code: "EEI4369",
     name: "Mobile App Development with Android",
@@ -253,7 +253,9 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     semester: 5,
   },
 
-  // Level 5 - Compulsory courses
+  // =================================================================
+  // LEVEL 5
+  // =================================================================
   EEI5263: {
     code: "EEI5263",
     name: "Computer Organization and Architecture",
@@ -344,8 +346,6 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     isCompulsory: true,
     semester: 6,
   },
-
-  // Level 5 - Elective courses
   EEI5378: {
     code: "EEI5378",
     name: "Neural Networks and Fuzzy Logic Applications",
@@ -374,7 +374,9 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     semester: 6,
   },
 
-  // Level 6 - Compulsory courses
+  // =================================================================
+  // LEVEL 6
+  // =================================================================
   EEI6360: {
     code: "EEI6360",
     name: "Software Project Management",
@@ -429,8 +431,6 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     isCompulsory: true,
     semester: 8,
   },
-
-  // Level 6 - Elective courses (Minimum 10 credits required)
   EEI6279: {
     code: "EEI6279",
     name: "Natural Language Processing",
@@ -485,6 +485,253 @@ export const BSE_COURSES: Record<string, CourseInfo> = {
     isCompulsory: false,
     semester: 8,
   },
+
+  // =================================================================
+  // LEGACY COURSES (Found in your screenshot)
+  // =================================================================
+  AGM3263: {
+    code: "AGM3263",
+    name: "Management & Accountancy (Legacy)",
+    level: 3,
+    credits: 2,
+    category: "M",
+    isCompulsory: true,
+    semester: 1,
+  },
+  CSI3361: {
+    code: "CSI3361",
+    name: "Computer Studies (Legacy)",
+    level: 3,
+    credits: 3,
+    category: "I",
+    isCompulsory: false,
+    semester: 1,
+  },
+  CVM5402: {
+    code: "CVM5402",
+    name: "Accounting for Engineers (Legacy)",
+    level: 5,
+    credits: 4,
+    category: "M",
+    isCompulsory: true,
+    semester: 1,
+  },
+  DMM6602: {
+    code: "DMM6602",
+    name: "Professional Practice (Legacy)",
+    level: 6,
+    credits: 6,
+    category: "M",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEI3266: {
+    code: "EEI3266",
+    name: "Computing Fundamentals (Legacy)",
+    level: 3,
+    credits: 2,
+    category: "I",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEI4346: {
+    code: "EEI4346",
+    name: "Web Development (Legacy)",
+    level: 4,
+    credits: 3,
+    category: "I",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEI4366: {
+    code: "EEI4366",
+    name: "Database Systems (Legacy)",
+    level: 4,
+    credits: 3,
+    category: "I",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEI5270: {
+    code: "EEI5270",
+    name: "Software Engineering Project (Legacy)",
+    level: 5,
+    credits: 2,
+    category: "I",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEW5811: {
+    code: "EEW5811",
+    name: "Industrial Training (Legacy)",
+    level: 5,
+    credits: 8,
+    category: "W",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX3373: {
+    code: "EEX3373",
+    name: "Programming Concepts (Legacy)",
+    level: 3,
+    credits: 3,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX3467: {
+    code: "EEX3467",
+    name: "Software Engineering Concepts (Legacy)",
+    level: 3,
+    credits: 4,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX4373: {
+    code: "EEX4373",
+    name: "Data Science (Legacy)",
+    level: 4,
+    credits: 3,
+    category: "X",
+    isCompulsory: false,
+    semester: 1,
+  },
+  EEX4465: {
+    code: "EEX4465",
+    name: "Data Structures (Legacy)",
+    level: 4,
+    credits: 4,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX5362: {
+    code: "EEX5362",
+    name: "Object Oriented Design (Legacy)",
+    level: 5,
+    credits: 3,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX5563: {
+    code: "EEX5563",
+    name: "Computer Architecture (Legacy)",
+    level: 5,
+    credits: 5,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEX6340: {
+    code: "EEX6340",
+    name: "Project Management (Legacy)",
+    level: 6,
+    credits: 3,
+    category: "X",
+    isCompulsory: false,
+    semester: 1,
+  },
+  EEX6363: {
+    code: "EEX6363",
+    name: "Compiler Construction (Legacy)",
+    level: 6,
+    credits: 3,
+    category: "X",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEY4189: {
+    code: "EEY4189",
+    name: "Group Project (Legacy)",
+    level: 4,
+    credits: 1,
+    category: "Y",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEY6189: {
+    code: "EEY6189",
+    name: "Seminar (Legacy)",
+    level: 6,
+    credits: 1,
+    category: "Y",
+    isCompulsory: true,
+    semester: 1,
+  },
+  EEY6689: {
+    code: "EEY6689",
+    name: "Final Year Project (Legacy)",
+    level: 6,
+    credits: 6,
+    category: "Y",
+    isCompulsory: true,
+    semester: 1,
+  },
+  FDE3020: {
+    code: "FDE3020",
+    name: "Empowering for Independent Learning (Legacy)",
+    level: 3,
+    credits: 0,
+    category: "J",
+    isCompulsory: true,
+    semester: 1,
+  },
+  ISI3376: {
+    code: "ISI3376",
+    name: "Information Systems (Legacy)",
+    level: 3,
+    credits: 3,
+    category: "I",
+    isCompulsory: false,
+    semester: 1,
+  },
+  LLJ3265: {
+    code: "LLJ3265",
+    name: "General Law (Legacy)",
+    level: 3,
+    credits: 2,
+    category: "L",
+    isCompulsory: false,
+    semester: 1,
+  },
+  LTE3401: {
+    code: "LTE3401",
+    name: "English for Academic Purposes (Legacy)",
+    level: 3,
+    credits: 4,
+    category: "L",
+    isCompulsory: true,
+    semester: 1,
+  },
+  MHJ5372: {
+    code: "MHJ5372",
+    name: "Management (Legacy)",
+    level: 5,
+    credits: 3,
+    category: "M",
+    isCompulsory: true,
+    semester: 1,
+  },
+  MHZ3459: {
+    code: "MHZ3459",
+    name: "Math for Computing I (Legacy)",
+    level: 3,
+    credits: 4,
+    category: "Z",
+    isCompulsory: true,
+    semester: 1,
+  },
+  MHZ4256: {
+    code: "MHZ4256",
+    name: "Math for Computing II (Legacy)",
+    level: 4,
+    credits: 2,
+    category: "Z",
+    isCompulsory: true,
+    semester: 1,
+  },
 };
 
 // Continuing Education courses (not counted in GPA)
@@ -492,6 +739,8 @@ export const CONTINUING_EDUCATION_COURSES = {
   FDE3023: "Empowering for Independent Learning",
   LTE34SE: "English for Academic Purposes-EAP - Elementary",
   MHZ2250: "Elementary Mathematics for Computing",
+  // Add legacy Continuing Ed courses if needed:
+  FDE3020: "Empowering for Independent Learning (Legacy)",
 };
 
 // Credit requirements by category for BSE Honours Degree
@@ -505,6 +754,9 @@ export const CREDIT_REQUIREMENTS = {
   L: { min: 6, max: 6 }, // Language
   E: { min: 0, max: 6 }, // Language (alternative)
   W: { min: 6, max: 6 }, // Industrial Training
+  // Legacy Categories (map to new ones if possible, otherwise they get tracked separately)
+  X: { min: 0, max: 78 }, // Legacy Engineering/Industrial
+  Y: { min: 0, max: 13 }, // Legacy Projects
 };
 
 // GPA Classification thresholds
