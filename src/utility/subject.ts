@@ -1,4 +1,11 @@
-export const compulsoryOrNot = [
+type CourseStatus = "compulsory" | "optional";
+
+type CompulsoryOrNot = {
+  code: string;
+  status: CourseStatus;
+};
+
+export const compulsoryOrNot: CompulsoryOrNot[] = [
   // Level 3 - Compulsory courses
   { code: "EEI3372", status: "compulsory" }, // Programming in Python
   { code: "EEI3366", status: "compulsory" }, // Database Systems
@@ -35,7 +42,6 @@ export const compulsoryOrNot = [
 
   // Level 5 - Compulsory courses
   { code: "EEI5263", status: "compulsory" }, // Computer Organization and Architecture
-  { code: "EEI5466", status: "compulsory" }, // Advanced Database Systems
   { code: "EEI5467", status: "compulsory" }, // Software Testing and Quality Assurance
   { code: "EER5289", status: "compulsory" }, // Research Methodology and Project Identification
   { code: "MHJ5383", status: "compulsory" }, // Technology, Society and Environment
@@ -49,6 +55,7 @@ export const compulsoryOrNot = [
   { code: "EEI5378", status: "optional" }, // Neural Networks and Fuzzy Logic Applications
   { code: "EEI5376", status: "optional" }, // Embedded systems and IOT
   { code: "MHJ5282", status: "optional" }, // History of Technology
+  { code: "EEI5466", status: "optional" }, // Advanced Database Systems
 
   // Level 6 - Compulsory courses
   { code: "EEI6360", status: "compulsory" }, // Software Project Management

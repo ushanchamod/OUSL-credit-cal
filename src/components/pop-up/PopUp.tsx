@@ -29,9 +29,9 @@ const PopUp = ({ setPopUp }: Props) => {
       aria-labelledby="help-dialog-title"
     >
       <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="relative p-6 max-h-[90vh] overflow-y-auto">
+        <div className="relative p-6 pt-0 max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-white pt-2 pb-4 flex justify-between items-center border-b border-gray-200 -mx-6 px-6">
+          <div className="sticky top-0 z-10 bg-white pt-7 pb-4 flex justify-between items-center border-b border-gray-200 -mx-6 px-6">
             <div>
               <h2
                 id="help-dialog-title"
